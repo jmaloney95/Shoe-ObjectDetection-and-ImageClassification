@@ -1,3 +1,5 @@
+<img src = https://user-images.githubusercontent.com/35541449/235310516-b11d07ac-f3e6-489d-b9bb-a1ad367c0829.png width="500">
+
 # Shoe Detection and Classification
 
 This project is focused on detecting shoes in images and classifying them using object detection and image classification models. The object detection model is trained to detect shoes in images, while the image classification model is trained to classify the detected shoes as Converse, Nike, or Adidas.
