@@ -56,6 +56,14 @@ You can easily modify this project to detect and classify other objects by:
 2. Updating the object detection and image classification model paths in the code.
 3. Modifying the preprocessing steps and output processing functions to match the requirements of your models.
 
+## Alpha Version
+Shoe Object Detection Stats
+Version 2 Generated Apr 28, 2023 mAP: 67.9% precision: 76.0%, recall: 67.9%
+Training Set: 173 images
+
+Sneaker Type Image Classification Stats
+Version 6 Generated Oct 12, 2022 accuracy: 81.3%
+Training Set: 2.9k images
 ## License
 
 This project is released under the MIT License. See the [LICENSE](https://opensource.org/license/mit/) file for more information.
