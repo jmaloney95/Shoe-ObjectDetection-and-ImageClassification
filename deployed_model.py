@@ -28,8 +28,8 @@ def preprocess_image(image_path):
     return input_batch
 
 # Load and preprocess the input image
-image_path = "c8.png"
-input_batch = preprocess_image(image_path)
+# image_path = "image_file"
+# input_batch = preprocess_image(image_path)
 
 # Perform inference
 output = ort_session.run(None, {'images': input_batch.numpy()})
