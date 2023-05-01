@@ -57,13 +57,33 @@ You can easily modify this project to detect and classify other objects by:
 3. Modifying the preprocessing steps and output processing functions to match the requirements of your models.
 
 ## Alpha Version
-Shoe Object Detection Stats
+ODM Stats
+
 Version 2 Generated Apr 28, 2023 mAP: 67.9% precision: 76.0%, recall: 67.9%
 Training Set: 173 images
 
-Sneaker Type Image Classification Stats
+ICM Stats
+
 Version 6 Generated Oct 12, 2022 accuracy: 81.3%
 Training Set: 2.9k images
+
+## Image Preprocessing
+The `preprocess_image` function applies a series of preprocessing steps to the input image before feeding it to the object detection model. Here's a brief explanation of each step:
+
+1. `transforms.Resize(input_size)`: This step resizes the input image so that its smallest dimension becomes equal to the specified `input_size`. The aspect ratio of the image is preserved.
+
+2. `transforms.CenterCrop(input_size)`: This step crops the input image to a square of size `input_size` x `input_size` from the center of the resized image. This is done to obtain a fixed-size input that the model can process.
+
+3. `transforms.ToTensor()`: This step converts the input image from the PIL format (used by the `Image` class) to a PyTorch tensor. This is the expected input format for most PyTorch models. The pixel values are also scaled from the range [0, 255] (integers) to the range [0, 1] (floats).
+
+4. `transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])`: This step normalizes the input tensor using the provided mean and standard deviation values. Normalization is done channel-wise (separately for each color channel) to ensure that each channel has a mean of 0 and a standard deviation of 1. This helps improve the model's performance and training stability.
+
+5. `image = Image.open(image_path).convert("RGB")`: This step opens the image file from the given path and converts it to the RGB format. This is necessary because some image files may have different color modes (e.g., grayscale, RGBA), and the model expects an RGB image as input.
+
+6. `input_tensor = preprocess(image)`: This step applies the composed preprocessing transformations to the input image.
+
+7. `input_batch = input_tensor.unsqueeze(0).to(device)`: This step adds an extra dimension to the input tensor to create a batch with a single image. This is because most deep learning models expect a batch of images as input, even if there's only one image. The tensor is then transferred to the specified device (GPU or CPU) for processing.
+
 ## License
 
 This project is released under the MIT License. See the [LICENSE](https://opensource.org/license/mit/) file for more information.
