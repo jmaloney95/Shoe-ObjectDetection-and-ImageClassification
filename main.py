@@ -32,6 +32,12 @@ os.makedirs(converse_output_dir, exist_ok=True)
 confidence_threshold = 0.5
 
 for image_file in image_files:
+    try:
+        results = model.predict(source=image_file)
+    except FileNotFoundError:
+        print(f"Image not found: {image_file}")
+        continue
+
     results = model.predict(source=image_file)
     image = cv2.imread(image_file)
     for result in results:
