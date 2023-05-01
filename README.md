@@ -11,11 +11,13 @@ This project is focused on detecting shoes in images and classifying them using 
 - PyTorch
 - torchvision
 - Roboflow
+- ONNX/ONNXruntime
+- Ultralytics
 
 You can install the required Python libraries using pip:
 
 ```bash
-pip install opencv-python torch torchvision roboflow
+pip install -r requirements.txt
 ```
 
 ## Usage
