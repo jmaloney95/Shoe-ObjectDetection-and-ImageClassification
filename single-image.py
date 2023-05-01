@@ -4,7 +4,6 @@ import onnx
 import onnxruntime as ort
 from PIL import Image
 from torchvision import transforms
-import os
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -25,14 +24,9 @@ def preprocess_image(image_path):
     image = Image.open(image_path).convert("RGB")
     input_tensor = preprocess(image)
     input_batch = input_tensor.unsqueeze(0).to(device)
-    return input_batch, preprocess
+    return input_batch
 
-def save_cropped_region(image, box, output_path):
-    x1, y1, x2, y2 = box['x'], box['y'], box['x'] + box['width'], box['y'] + box['height']
-    cropped_image = image[y1:y2, x1:x2]
-    cv2.imwrite(output_path, cropped_image)
-
-def process_output(output, confidence_threshold=0.5):
+def process_output(output, confidence_threshold=0.25):
     detections = output[0][0]
     boxes = [
         {
@@ -40,8 +34,8 @@ def process_output(output, confidence_threshold=0.5):
             "confidence": float(detection[1]),
             "x": int(detection[2]),
             "y": int(detection[3]),
-            "width": abs(int(detection[4] - detection[2])),
-            "height": abs(int(detection[5] - detection[3])),
+            "width": int(detection[4] - detection[2]),
+            "height": int(detection[5] - detection[3]),
         }
         for detection in detections
         if float(detection[1]) > confidence_threshold
@@ -52,25 +46,22 @@ def process_output(output, confidence_threshold=0.5):
 
     highest_confidence_prediction = max(boxes, key=lambda x: x['confidence'])
 
-    print(highest_confidence_prediction)
     return [highest_confidence_prediction]
-    
 
-input_folder = "input_images"
-output_folder = "cropped_regions"
+def save_cropped_region(image, box, output_path):
+    x1, y1, x2, y2 = box['x'], box['y'], box['x'] + box['width'], box['y'] + box['height']
+    cropped_image = image[y1:y2, x1:x2]
+    cv2.imwrite(output_path, cropped_image)
 
-if not os.path.exists(output_folder):
-    os.makedirs(output_folder)
+# Provide the path to the single image you want to process
+image_path = "c28.png"
 
-for image_name in os.listdir(input_folder):
-    image_path = os.path.join(input_folder, image_name)
-    input_batch, preprocess = preprocess_image(image_path)
+input_batch = preprocess_image(image_path)
+output = ort_session.run(None, {'images': input_batch.numpy()})
+boxes = process_output(output)
 
-    output = ort_session.run(None, {'images': input_batch.numpy()})
-    boxes = process_output(output)
-
-    image = cv2.imread(image_path)
-    for box in boxes:
-        output_path = os.path.join(output_folder, f"cropped_{image_name}")
-        save_cropped_region(image, box, output_path)
-        print(f"Image: {image_name}, Bounding Box: x: {box['x']}, y: {box['y']}, width: {box['width']}, height: {box['height']}")  # Print bounding box dimensions
+image = cv2.imread(image_path)
+for box in boxes:
+    output_path = "cropped_c28.jpg"  # Specify the output path for the cropped image
+    save_cropped_region(image, box, output_path)
+    print(f"Bounding Box: x: {box['x']}, y: {box['y']}, width: {box['width']}, height: {box['height']}")  # Print bounding box dimensions
