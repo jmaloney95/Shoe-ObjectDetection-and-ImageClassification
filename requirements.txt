@@ -1,0 +1,9 @@
+opencv-python
+torch
+torchvision
+roboflow
+os
+cv2
+onnx
+onnxruntime
+ultralytics
