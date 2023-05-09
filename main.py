@@ -13,7 +13,7 @@ def save_cropped_region(image, box, output_path):
     cropped_image = image[y1:y2, x1:x2]
     cv2.imwrite(output_path, cropped_image)
 
-model = YOLO("model.pt")
+model = YOLO("best.pt")
 
 # Replace with your Roboflow API key
 rf = Roboflow(api_key="Fe80wL4p7rLnbPpfx6lI")
