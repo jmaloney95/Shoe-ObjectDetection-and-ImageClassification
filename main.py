@@ -5,6 +5,7 @@ from PIL import Image
 from torchvision import transforms
 from roboflow import Roboflow
 import torch
+from dotenv import load_dotenv
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -15,8 +16,8 @@ def save_cropped_region(image, box, output_path):
 
 model = YOLO("best.pt")
 
-# Replace with your Roboflow API key
-rf = Roboflow(api_key="Fe80wL4p7rLnbPpfx6lI")
+ROBOFLOW_API_KEY = os.getenv('ROBOFLOW_API_KEY')
+rf = Roboflow(api_key=ROBOFLOW_API_KEY)
 project = rf.workspace().project("nike-adidas-and-converse-shoes-classification")
 classification_model = project.version(6).model
 
@@ -24,18 +25,18 @@ input_folder = "input_images"
 image_files = [os.path.join(input_folder, f) for f in os.listdir(input_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
 cropped_output_dir = "cropped_regions"
-converse_output_dir = "converse_images"
+detected_output_dir = "detected_images"
 
 os.makedirs(cropped_output_dir, exist_ok=True)
-os.makedirs(converse_output_dir, exist_ok=True)
+os.makedirs(detected_output_dir, exist_ok=True)
 
 confidence_threshold = 0.5
 
 for image_file in image_files:
     try:
         results = model.predict(source=image_file)
-    except FileNotFoundError:
-        print(f"Image not found: {image_file}")
+    except AssertionError as e:
+        print(f"Error with image {image_file}, skipping to next. Error details: {str(e)}")
         continue
 
     results = model.predict(source=image_file)
@@ -56,8 +57,8 @@ for image_file in image_files:
                 classification_result = classification_model.predict(output_path).json()
                 top_prediction = classification_result['predictions'][0]['top']
                 if top_prediction.lower() == 'converse':
-                    converse_image_path = os.path.join(converse_output_dir, os.path.basename(image_file))
-                    cv2.imwrite(converse_image_path, image)
-                    print(f"Saved original image with Converse detected as {converse_image_path}")
+                    detected_image_path = os.path.join(detected_output_dir, os.path.basename(image_file))
+                    cv2.imwrite(detected_image_path, image)
+                    print(f"Saved original image with shoe type detected as {detected_image_path}")
 
 input("Press Enter to exit...")
